@@ -2,8 +2,6 @@
 
 Paste messy stakeholder feedback — get clean themes, conflicts, and an action plan ready to share.
 
-Built with Claude claude-opus-4-7, Node.js, and a custom design token system.
-
 ---
 
 ## What it does
@@ -32,12 +30,13 @@ The output covers seven sections:
 - Run test data button — loads a sample scenario and streams a mock report instantly, no API credits used
 
 **Output**
-- Streams in real time as Claude generates the report
+- Streams in real time as the report generates
 - Slide-in animation — the output panel eases in from the right when synthesis starts
 - Download report as PDF (via print dialog) or DOC (`.docx`)
 - Rate the report (Useful / Needs work) with an optional comment
 
 **App**
+- Landing page with product overview and CTA
 - Give feedback button in the header — opens a modal with type chips (Bug, Suggestion, Praise, Other)
 - Frosted glass sticky header
 - Satoshi font, plum/taupe colour scheme built on a full design token system
@@ -85,9 +84,10 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ```
 ├── src/
-│   ├── server.js          # Express server, Claude API streaming endpoint
+│   ├── server.js          # Express server, AI streaming endpoint
 │   └── public/
-│       ├── index.html     # UI — layout, styles, all components
+│       ├── index.html     # Landing page
+│       ├── app.html       # App — layout, styles, all components
 │       └── app.js         # Client-side logic — streaming, upload, download, modals
 ├── tokens/                # Design token source files (Style Dictionary)
 │   ├── color/
@@ -130,7 +130,6 @@ npx style-dictionary build --config config.json
 
 | Layer | Technology |
 |---|---|
-| LLM | Claude claude-opus-4-7 with adaptive thinking |
 | Server | Node.js + Express 5 |
 | Streaming | Server-Sent Events (SSE) |
 | Frontend | Vanilla JS, no framework |
