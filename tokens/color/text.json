@@ -1,0 +1,10 @@
+{
+  "color": {
+    "text": {
+      "primary":    { "value": "{color.base.ink-900}", "type": "color" },
+      "muted":      { "value": "{color.base.ink-600}", "type": "color" },
+      "on-primary": { "value": "{color.base.white}",   "type": "color" },
+      "on-soft":    { "value": "{color.base.ink-900}", "type": "color" }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "component": {
+    "hero": {
+      "background":             { "value": "{color.background.page}",       "type": "color" },
+      "headline-color":         { "value": "{color.text.primary}",          "type": "color" },
+      "subtext-color":          { "value": "{color.text.muted}",            "type": "color" },
+      "primary-button-bg":      { "value": "{color.action.primary.bg}",     "type": "color" },
+      "primary-button-text":    { "value": "{color.action.primary.text}",   "type": "color" },
+      "secondary-button-bg":    { "value": "{color.action.secondary.bg}",   "type": "color" },
+      "secondary-button-text":  { "value": "{color.action.secondary.text}", "type": "color" }
+    }
+  }
+}

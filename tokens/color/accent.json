@@ -1,0 +1,9 @@
+{
+  "color": {
+    "accent": {
+      "soft":     { "value": "{color.base.plum-300}", "type": "color" },
+      "tag-bg":   { "value": "{color.base.plum-300}", "type": "color" },
+      "tag-text": { "value": "{color.base.ink-900}",  "type": "color" }
+    }
+  }
+}

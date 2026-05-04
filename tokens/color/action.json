@@ -1,0 +1,17 @@
+{
+  "color": {
+    "action": {
+      "primary": {
+        "bg":       { "value": "{color.base.plum-500}", "type": "color" },
+        "bg-hover": { "value": "#724460",               "type": "color" },
+        "text":     { "value": "{color.base.white}",    "type": "color" }
+      },
+      "secondary": {
+        "bg":       { "value": "{color.base.taupe-100}", "type": "color" },
+        "bg-hover": { "value": "{color.base.taupe-300}", "type": "color" },
+        "text":     { "value": "{color.base.ink-900}",   "type": "color" },
+        "border":   { "value": "{color.base.plum-500}",  "type": "color" }
+      }
+    }
+  }
+}

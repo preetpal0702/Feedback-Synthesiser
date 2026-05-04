@@ -1,0 +1,9 @@
+{
+  "color": {
+    "background": {
+      "page":     { "value": "{color.base.taupe-50}",  "type": "color" },
+      "section":  { "value": "{color.base.taupe-100}", "type": "color" },
+      "elevated": { "value": "{color.base.white}",     "type": "color" }
+    }
+  }
+}

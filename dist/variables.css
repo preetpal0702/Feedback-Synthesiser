@@ -1,0 +1,71 @@
+/**
+ * Do not edit directly, this file was auto-generated.
+ */
+
+:root {
+  --color-base-taupe-50: #f5f1ea;
+  --color-base-taupe-100: #e6ded1;
+  --color-base-taupe-300: #d6cec4;
+  --color-base-plum-500: #8a5b76;
+  --color-base-plum-300: #c9a7bd;
+  --color-base-ink-900: #2b2522;
+  --color-base-ink-600: #7a6f68;
+  --color-base-white: #ffffff;
+  --color-action-primary-bg-hover: #724460;
+  --color-status-success-bg: #d3f4d8;
+  --color-status-success-text: #205429;
+  --color-status-warning-bg: #fff4d6;
+  --color-status-warning-text: #7a4a0a;
+  --color-status-danger-bg: #fde2e0;
+  --color-status-danger-text: #8c1d18;
+  --font-family-base: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 32px;
+  --font-line-height-tight: 1.2;
+  --font-line-height-normal: 1.5;
+  --font-line-height-relaxed: 1.7;
+  --size-space-xs: 4px;
+  --size-space-sm: 8px;
+  --size-space-md: 12px;
+  --size-space-lg: 16px;
+  --size-space-xl: 24px;
+  --size-space-2xl: 32px;
+  --size-radius-sm: 4px;
+  --size-radius-md: 8px;
+  --size-radius-lg: 12px;
+  --size-radius-pill: 999px;
+  --size-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --size-shadow-md: 0 4px 10px rgba(15, 23, 42, 0.08);
+  --color-background-page: var(--color-base-taupe-50);
+  --color-background-section: var(--color-base-taupe-100);
+  --color-background-elevated: var(--color-base-white);
+  --color-border-subtle: var(--color-base-taupe-300);
+  --color-border-strong: var(--color-base-ink-900);
+  --color-text-primary: var(--color-base-ink-900);
+  --color-text-muted: var(--color-base-ink-600);
+  --color-text-on-primary: var(--color-base-white);
+  --color-text-on-soft: var(--color-base-ink-900);
+  --color-action-primary-bg: var(--color-base-plum-500);
+  --color-action-primary-text: var(--color-base-white);
+  --color-action-secondary-bg: var(--color-base-taupe-100);
+  --color-action-secondary-bg-hover: var(--color-base-taupe-300);
+  --color-action-secondary-text: var(--color-base-ink-900);
+  --color-action-secondary-border: var(--color-base-plum-500);
+  --color-accent-soft: var(--color-base-plum-300);
+  --color-accent-tag-bg: var(--color-base-plum-300);
+  --color-accent-tag-text: var(--color-base-ink-900);
+  --component-hero-background: var(--color-background-page);
+  --component-hero-headline-color: var(--color-text-primary);
+  --component-hero-subtext-color: var(--color-text-muted);
+  --component-hero-primary-button-bg: var(--color-action-primary-bg);
+  --component-hero-primary-button-text: var(--color-action-primary-text);
+  --component-hero-secondary-button-bg: var(--color-action-secondary-bg);
+  --component-hero-secondary-button-text: var(--color-action-secondary-text);
+}

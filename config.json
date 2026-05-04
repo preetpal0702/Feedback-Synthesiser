@@ -1,0 +1,29 @@
+{
+  "source": [
+    "tokens/color/base.json",
+    "tokens/color/background.json",
+    "tokens/color/border.json",
+    "tokens/color/text.json",
+    "tokens/color/action.json",
+    "tokens/color/accent.json",
+    "tokens/color/status.json",
+    "tokens/font.json",
+    "tokens/size.json",
+    "tokens/component/hero.json"
+  ],
+  "platforms": {
+    "css": {
+      "transformGroup": "css",
+      "buildPath": "dist/",
+      "files": [
+        {
+          "destination": "variables.css",
+          "format": "css/variables",
+          "options": {
+            "outputReferences": true
+          }
+        }
+      ]
+    }
+  }
+}

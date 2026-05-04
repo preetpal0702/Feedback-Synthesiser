@@ -1,0 +1,8 @@
+{
+  "color": {
+    "border": {
+      "subtle": { "value": "{color.base.taupe-300}", "type": "color" },
+      "strong": { "value": "{color.base.ink-900}",   "type": "color" }
+    }
+  }
+}

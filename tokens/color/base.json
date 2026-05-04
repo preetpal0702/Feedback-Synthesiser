@@ -1,0 +1,14 @@
+{
+  "color": {
+    "base": {
+      "taupe-50":  { "value": "#F5F1EA", "type": "color" },
+      "taupe-100": { "value": "#E6DED1", "type": "color" },
+      "taupe-300": { "value": "#D6CEC4", "type": "color" },
+      "plum-500":  { "value": "#8A5B76", "type": "color" },
+      "plum-300":  { "value": "#C9A7BD", "type": "color" },
+      "ink-900":   { "value": "#2B2522", "type": "color" },
+      "ink-600":   { "value": "#7A6F68", "type": "color" },
+      "white":     { "value": "#FFFFFF", "type": "color" }
+    }
+  }
+}

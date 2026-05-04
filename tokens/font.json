@@ -1,0 +1,28 @@
+{
+  "font": {
+    "family": {
+      "base": {
+        "value": "Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        "type": "font"
+      }
+    },
+    "weight": {
+      "regular":  { "value": 400, "type": "fontWeight" },
+      "medium":   { "value": 500, "type": "fontWeight" },
+      "semibold": { "value": 600, "type": "fontWeight" }
+    },
+    "size": {
+      "xs":  { "value": "12px", "type": "fontSize" },
+      "sm":  { "value": "14px", "type": "fontSize" },
+      "md":  { "value": "16px", "type": "fontSize" },
+      "lg":  { "value": "20px", "type": "fontSize" },
+      "xl":  { "value": "24px", "type": "fontSize" },
+      "2xl": { "value": "32px", "type": "fontSize" }
+    },
+    "lineHeight": {
+      "tight":   { "value": 1.2, "type": "lineHeights" },
+      "normal":  { "value": 1.5, "type": "lineHeights" },
+      "relaxed": { "value": 1.7, "type": "lineHeights" }
+    }
+  }
+}

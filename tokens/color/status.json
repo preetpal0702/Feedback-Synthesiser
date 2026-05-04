@@ -1,0 +1,18 @@
+{
+  "color": {
+    "status": {
+      "success": {
+        "bg":   { "value": "#D3F4D8", "type": "color" },
+        "text": { "value": "#205429", "type": "color" }
+      },
+      "warning": {
+        "bg":   { "value": "#FFF4D6", "type": "color" },
+        "text": { "value": "#7A4A0A", "type": "color" }
+      },
+      "danger": {
+        "bg":   { "value": "#FDE2E0", "type": "color" },
+        "text": { "value": "#8C1D18", "type": "color" }
+      }
+    }
+  }
+}
