@@ -58,7 +58,7 @@ Writing style:
 Use markdown formatting throughout. Use ## for section headers, **bold** for emphasis, and bullet points where appropriate.`;
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public"), { extensions: ["html"] }));
 app.use("/dist", express.static(path.join(__dirname, "..", "dist")));
 
 app.post("/synthesise", async (req, res) => {

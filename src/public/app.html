@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feedback Synthesiser</title>
+  <link rel="stylesheet" href="/dist/variables.css" />
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --font-family-base: 'Satoshi', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-md);
+      line-height: var(--font-line-height-normal);
+      color: var(--color-text-primary);
+      background: var(--color-background-page);
+    }
+
+    /* ── Layout ── */
+    .app {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(245, 241, 234, 0.72);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--color-border-subtle);
+      padding: var(--size-space-lg) var(--size-space-2xl);
+      box-shadow: 0 1px 0 rgba(43, 37, 34, 0.06);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--size-space-xl);
+    }
+
+    header h1 {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    header p {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-top: var(--size-space-xs);
+    }
+
+    .btn-feedback {
+      flex-shrink: 0;
+      padding: var(--size-space-sm) var(--size-space-lg);
+      background: transparent;
+      color: var(--color-text-muted);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--size-radius-md);
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-feedback:hover {
+      border-color: var(--color-action-primary-bg);
+      color: var(--color-action-primary-bg);
+      background: rgba(138, 91, 118, 0.05);
+    }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(43, 37, 34, 0.4);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: var(--color-background-elevated);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--size-radius-lg);
+      box-shadow: var(--size-shadow-md);
+      width: 100%;
+      max-width: 480px;
+      margin: var(--size-space-xl);
+      transform: translateY(10px);
+      transition: transform 0.2s ease;
+    }
+
+    .modal-overlay.open .modal {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--size-space-xl);
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+
+    .modal-header h2 {
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--color-text-muted);
+      font-size: var(--font-size-md);
+      line-height: 1;
+      padding: var(--size-space-xs);
+      border-radius: var(--size-radius-sm);
+      transition: color 0.1s ease, background 0.1s ease;
+    }
+
+    .modal-close:hover {
+      color: var(--color-text-primary);
+      background: var(--color-background-section);
+    }
+
+    .modal-body {
+      padding: var(--size-space-xl);
+      display: flex;
+      flex-direction: column;
+      gap: var(--size-space-lg);
+    }
+
+    .feedback-types {
+      display: flex;
+      gap: var(--size-space-sm);
+    }
+
+    .type-chip {
+      padding: var(--size-space-xs) var(--size-space-md);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--size-radius-pill);
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      background: transparent;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .type-chip:hover {
+      border-color: var(--color-action-primary-bg);
+      color: var(--color-action-primary-bg);
+    }
+
+    .type-chip.active {
+      background: var(--color-action-primary-bg);
+      border-color: var(--color-action-primary-bg);
+      color: var(--color-action-primary-text);
+    }
+
+    .modal-body textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--size-space-md);
+      padding: var(--size-space-lg) var(--size-space-xl);
+      border-top: 1px solid var(--color-border-subtle);
+    }
+
+    .modal-thanks {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--size-space-md);
+      padding: var(--size-space-2xl) var(--size-space-xl);
+      text-align: center;
+      color: var(--color-text-muted);
+      font-size: var(--font-size-sm);
+    }
+
+    .modal-thanks .thanks-icon {
+      font-size: 32px;
+    }
+
+    main {
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ── Input panel ── */
+    .panel-input {
+      display: flex;
+      flex-direction: column;
+      gap: var(--size-space-lg);
+      /* In landing state: centre the form with expanding side padding */
+      padding: var(--size-space-xl) max(var(--size-space-2xl), calc((100% - 640px) / 2));
+      overflow-y: auto;
+      flex: 1;
+      transition: padding 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                  border-color 0.5s ease;
+      border-right: 1px solid transparent;
+    }
+
+    main.split .panel-input {
+      padding: var(--size-space-xl) var(--size-space-2xl);
+      border-right-color: var(--color-border-subtle);
+    }
+
+    .panel-label {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Form fields ── */
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--size-space-xs);
+    }
+
+    .field-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+      letter-spacing: 0.01em;
+      display: flex;
+      align-items: center;
+      gap: var(--size-space-xs);
+    }
+
+    .optional {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-regular);
+      color: var(--color-text-muted);
+    }
+
+    .field-input {
+      width: 100%;
+      padding: var(--size-space-sm) var(--size-space-md);
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-sm);
+      line-height: var(--font-line-height-normal);
+      color: var(--color-text-primary);
+      background: var(--color-background-elevated);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--size-radius-md);
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .field-input:focus {
+      border-color: var(--color-action-primary-bg);
+      box-shadow: 0 0 0 3px rgba(138, 91, 118, 0.12);
+    }
+
+    .field-input::placeholder,
+    textarea::placeholder { color: var(--color-text-muted); opacity: 0.7; }
+
+    textarea {
+      width: 100%;
+      padding: var(--size-space-md);
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-sm);
+      line-height: var(--font-line-height-relaxed);
+      color: var(--color-text-primary);
+      background: var(--color-background-elevated);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--size-radius-md);
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    textarea.sm { min-height: 72px; }
+    textarea.lg { flex: 1; min-height: 180px; }
+
+    textarea:focus {
+      border-color: var(--color-action-primary-bg);
+      box-shadow: 0 0 0 3px rgba(138, 91, 118, 0.12);
+    }
+
+    textarea.drag-over {
+      border-color: var(--color-action-primary-bg);
+      box-shadow: 0 0 0 3px rgba(138, 91, 118, 0.18);
+      background: rgba(138, 91, 118, 0.04);
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--color-border-subtle);
+      margin: 0;
+    }
+
+    .upload-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--size-space-sm);
+    }
+
+    .btn-upload {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--size-space-xs);
+      padding: var(--size-space-sm) var(--size-space-md);
+      background: transparent;
+      color: var(--color-text-muted);
+      border: 1px dashed var(--color-border-subtle);
+      border-radius: var(--size-radius-md);
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-upload:hover {
+      border-color: var(--color-action-primary-bg);
+      color: var(--color-action-primary-bg);
+      background: rgba(138, 91, 118, 0.05);
+    }
+
+    .upload-hint {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      opacity: 0.7;
+    }
+
+    .file-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--size-space-xs);
+    }
+
+    .file-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px var(--size-space-sm);
+      background: var(--color-accent-tag-bg);
+      color: var(--color-accent-tag-text);
+      border-radius: var(--size-radius-pill);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .file-chip button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: inherit;
+      opacity: 0.6;
+      font-size: 11px;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .file-chip button:hover { opacity: 1; }
+
+    /* ── Panel header row ── */
+    .panel-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* ── Simple mode toggle ── */
+    .simple-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--size-space-xs);
+      cursor: pointer;
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      font-weight: var(--font-weight-medium);
+      user-select: none;
+    }
+
+    .simple-toggle input { display: none; }
+
+    .toggle-track {
+      width: 28px;
+      height: 16px;
+      background: var(--color-border-subtle);
+      border-radius: var(--size-radius-pill);
+      position: relative;
+      flex-shrink: 0;
+      transition: background 0.2s ease;
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: white;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.2s ease;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    }
+
+    .simple-toggle input:checked ~ .toggle-track {
+      background: var(--color-action-primary-bg);
+    }
+
+    .simple-toggle input:checked ~ .toggle-track::after {
+      transform: translateX(12px);
+    }
+
+    /* ── Template fields wrapper ── */
+    #template-fields {
+      display: flex;
+      flex-direction: column;
+      gap: var(--size-space-lg);
+    }
+
+    .input-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--size-space-md);
+    }
+
+    .btn-primary {
+      padding: var(--size-space-md) var(--size-space-xl);
+      background: var(--color-action-primary-bg);
+      color: var(--color-action-primary-text);
+      border: none;
+      border-radius: var(--size-radius-md);
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .btn-primary:hover { background: var(--color-action-primary-bg-hover); }
+    .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .btn-secondary {
+      padding: var(--size-space-md) var(--size-space-lg);
+      background: var(--color-action-secondary-bg);
+      color: var(--color-action-secondary-text);
+      border: 1px solid var(--color-action-secondary-border);
+      border-radius: var(--size-radius-md);
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .btn-secondary:hover { background: var(--color-action-secondary-bg-hover); }
+
+    .btn-ghost {
+      padding: var(--size-space-md) var(--size-space-lg);
+      background: transparent;
+      color: var(--color-text-muted);
+      border: none;
+      border-radius: var(--size-radius-md);
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      cursor: pointer;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+
+    .btn-ghost:hover {
+      color: var(--color-text-primary);
+      background: var(--color-background-section);
+    }
+
+    .char-count {
+      margin-left: auto;
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+    }
+
+    /* ── Output panel ── */
+    .panel-output {
+      display: flex;
+      flex-direction: column;
+      gap: var(--size-space-lg);
+      padding: var(--size-space-xl) var(--size-space-2xl);
+      overflow-y: auto;
+      background: var(--color-background-section);
+      /* Hidden until synthesis starts */
+      flex: 0 0 0%;
+      opacity: 0;
+      overflow: hidden;
+      transition: flex-basis 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 0.4s ease 0.2s;
+    }
+
+    main.split .panel-output {
+      flex: 0 0 50%;
+      opacity: 1;
+      overflow-y: auto;
+    }
+
+    .output-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--size-space-xs);
+      padding: var(--size-space-xs) var(--size-space-md);
+      border-radius: var(--size-radius-pill);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .status-badge.idle {
+      background: var(--color-background-elevated);
+      color: var(--color-text-muted);
+    }
+
+    .status-badge.running {
+      background: var(--color-status-success-bg);
+      color: var(--color-status-success-text);
+    }
+
+    .status-badge.error {
+      background: var(--color-status-danger-bg);
+      color: var(--color-status-danger-text);
+    }
+
+    .spinner {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .output-card {
+      background: var(--color-background-elevated);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--size-radius-lg);
+      padding: var(--size-space-xl);
+      box-shadow: var(--size-shadow-sm);
+    }
+
+    .output-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 360px;
+      gap: var(--size-space-md);
+      color: var(--color-text-muted);
+      text-align: center;
+    }
+
+    .output-empty svg {
+      opacity: 0.35;
+    }
+
+    .output-empty p {
+      font-size: var(--font-size-sm);
+      max-width: 260px;
+    }
+
+    /* ── Markdown output ── */
+    .output-content {
+      font-size: var(--font-size-sm);
+      line-height: var(--font-line-height-relaxed);
+      color: var(--color-text-primary);
+    }
+
+    .output-content h2 {
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+      margin: var(--size-space-xl) 0 var(--size-space-md);
+      padding-bottom: var(--size-space-xs);
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+
+    .output-content h2:first-child { margin-top: 0; }
+
+    .output-content h3 {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      margin: var(--size-space-lg) 0 var(--size-space-sm);
+    }
+
+    .output-content p {
+      margin-bottom: var(--size-space-md);
+    }
+
+    .output-content ul, .output-content ol {
+      padding-left: var(--size-space-xl);
+      margin-bottom: var(--size-space-md);
+    }
+
+    .output-content li {
+      margin-bottom: var(--size-space-xs);
+    }
+
+    .output-content strong {
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .output-content em {
+      font-style: italic;
+      color: var(--color-text-muted);
+    }
+
+    .output-content code {
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: 0.9em;
+      background: var(--color-background-section);
+      padding: 1px 5px;
+      border-radius: var(--size-radius-sm);
+    }
+
+    .output-content blockquote {
+      border-left: 3px solid var(--color-accent-soft);
+      padding-left: var(--size-space-lg);
+      margin: var(--size-space-md) 0;
+      color: var(--color-text-muted);
+      font-style: italic;
+    }
+
+    /* Slack-ready section gets a distinct background */
+    .slack-block {
+      background: var(--color-background-section);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--size-radius-md);
+      padding: var(--size-space-lg);
+      margin-top: var(--size-space-sm);
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: var(--font-size-xs);
+      white-space: pre-wrap;
+      position: relative;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: var(--size-space-sm);
+      right: var(--size-space-sm);
+      padding: var(--size-space-xs) var(--size-space-sm);
+      background: var(--color-background-elevated);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--size-radius-sm);
+      font-size: var(--font-size-xs);
+      cursor: pointer;
+      color: var(--color-text-muted);
+      font-family: var(--font-family-base);
+      transition: all 0.1s ease;
+    }
+
+    .copy-btn:hover {
+      background: var(--color-action-secondary-bg-hover);
+      color: var(--color-text-primary);
+    }
+
+
+    /* ── Cursor blink ── */
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: var(--color-action-primary-bg);
+      vertical-align: text-bottom;
+      animation: blink 0.9s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* ── Output header actions ── */
+    .output-header-right {
+      display: flex;
+      align-items: center;
+      gap: var(--size-space-sm);
+    }
+
+    .download-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--size-space-xs);
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: var(--size-space-xs) var(--size-space-md);
+      background: var(--color-background-elevated);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--size-radius-md);
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-download:hover {
+      border-color: var(--color-action-primary-bg);
+      color: var(--color-action-primary-bg);
+      background: rgba(138, 91, 118, 0.05);
+    }
+
+    /* ── Report feedback bar ── */
+    .report-feedback-bar {
+      margin-top: var(--size-space-xl);
+      padding-top: var(--size-space-lg);
+      border-top: 1px solid var(--color-border-subtle);
+      display: flex;
+      align-items: center;
+      gap: var(--size-space-lg);
+      flex-wrap: wrap;
+    }
+
+    .report-feedback-bar .feedback-prompt {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      flex-shrink: 0;
+    }
+
+    .vote-buttons {
+      display: flex;
+      gap: var(--size-space-xs);
+    }
+
+    .vote-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: var(--size-space-xs) var(--size-space-md);
+      background: var(--color-background-section);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--size-radius-pill);
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .vote-btn:hover { border-color: var(--color-action-primary-bg); color: var(--color-action-primary-bg); }
+    .vote-btn.active-up   { background: var(--color-status-success-bg); border-color: var(--color-status-success-text); color: var(--color-status-success-text); }
+    .vote-btn.active-down { background: var(--color-status-danger-bg);  border-color: var(--color-status-danger-text);  color: var(--color-status-danger-text); }
+
+    .report-comment-wrap {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: var(--size-space-sm);
+      margin-top: var(--size-space-sm);
+    }
+
+    .report-comment-wrap textarea {
+      min-height: 72px;
+    }
+
+    .report-comment-wrap .btn-row {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .feedback-thanks {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+
+    /* ── Print ── */
+    @media print {
+      html, body { height: auto; overflow: visible; }
+      .app { display: block; }
+      header, .panel-input, .output-header, .report-feedback-bar, .copy-btn, .modal-overlay { display: none !important; }
+      .panel-output { background: white; padding: 0; overflow: visible; }
+      main { display: block; }
+      .output-card { box-shadow: none; border: none; padding: 0; }
+      .output-content { display: block !important; }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      main { flex-direction: column; height: auto; }
+      main.split .panel-input { padding: var(--size-space-xl) var(--size-space-2xl); border-right: none; border-bottom: 1px solid var(--color-border-subtle); }
+      main.split .panel-output { flex: 1 1 auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="header-inner">
+        <div>
+          <h1>Feedback Synthesiser</h1>
+          <p>Paste messy stakeholder feedback — get clean themes, conflicts, and an action plan.</p>
+        </div>
+        <button class="btn-feedback" onclick="openFeedbackModal()">Give feedback</button>
+      </div>
+    </header>
+
+    <!-- Feedback modal -->
+    <div class="modal-overlay" id="feedback-modal" onclick="handleOverlayClick(event)">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Give feedback</h2>
+          <button class="modal-close" onclick="closeFeedbackModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-body">
+          <div class="field">
+            <label class="field-label">What kind of feedback?</label>
+            <div class="feedback-types">
+              <button class="type-chip active" onclick="selectType(this)">Bug</button>
+              <button class="type-chip" onclick="selectType(this)">Suggestion</button>
+              <button class="type-chip" onclick="selectType(this)">Praise</button>
+              <button class="type-chip" onclick="selectType(this)">Other</button>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="modal-feedback">Your feedback</label>
+            <textarea id="modal-feedback" placeholder="Tell us what's on your mind…"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer" id="modal-footer">
+          <button class="btn-secondary" onclick="closeFeedbackModal()">Cancel</button>
+          <button class="btn-primary" onclick="submitFeedback()">Send feedback</button>
+        </div>
+      </div>
+    </div>
+
+    <main>
+      <!-- Input -->
+      <section class="panel-input">
+        <div class="panel-header-row">
+          <div class="panel-label" id="panel-title">Feedback Template</div>
+          <label class="simple-toggle">
+            <input type="checkbox" id="simple-toggle" onchange="toggleSimpleMode(this.checked)" />
+            Keep it simple
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+
+        <div id="template-fields">
+          <div class="field">
+            <label class="field-label" for="project-name">
+              Project name <span class="optional">optional</span>
+            </label>
+            <input
+              type="text"
+              id="project-name"
+              class="field-input"
+              placeholder="e.g. Onboarding redesign"
+            />
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="decision">What we are trying to decide</label>
+            <textarea
+              id="decision"
+              class="sm"
+              placeholder="e.g. Whether to ship the revised onboarding flow in Q3 or delay to Q4"
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="priority">Priority focus</label>
+            <input
+              type="text"
+              id="priority"
+              class="field-input"
+              placeholder="e.g. User confidence, engineering feasibility, time to ship"
+            />
+          </div>
+
+          <hr class="divider" />
+        </div>
+
+        <div class="field">
+          <label class="field-label" id="feedback-label" for="feedback">Raw feedback</label>
+
+          <div class="upload-bar">
+            <button class="btn-upload" onclick="document.getElementById('file-input').click()">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 1v9M4.5 4.5L8 1l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              Upload transcript
+            </button>
+            <span class="upload-hint">or drag &amp; drop · txt, md, vtt, srt, csv</span>
+          </div>
+
+          <div class="file-chips" id="file-chips"></div>
+
+          <input
+            type="file"
+            id="file-input"
+            accept=".txt,.md,.vtt,.srt,.csv"
+            multiple
+            style="display:none"
+            onchange="handleFiles(this.files)"
+          />
+
+          <textarea
+            id="feedback"
+            class="lg"
+            placeholder="Paste raw stakeholder feedback here — quotes, bullet points, emails, meeting notes, anything goes.
+
+• PM: 'Users are confused by the onboarding but the core feature is solid'
+• Design: 'The flow works but we never validated the tooltip approach'
+• Eng lead: 'We can't ship the revised flow in Q3, the backend needs 6 weeks'
+• CEO: 'Competitors are eating our lunch — we need to move NOW'
+• Research: 'Only 2 of 8 participants completed onboarding in testing'"
+          ></textarea>
+        </div>
+
+        <div class="input-actions">
+          <button class="btn-primary" id="synthesise-btn" onclick="synthesise()">
+            Synthesise
+          </button>
+          <button class="btn-secondary" onclick="clearAll()">Clear</button>
+          <button class="btn-ghost" onclick="runTestData()">Run test data</button>
+          <span class="char-count" id="char-count">0 chars</span>
+        </div>
+      </section>
+
+      <!-- Output -->
+      <section class="panel-output">
+        <div class="output-header">
+          <div class="panel-label">Synthesis</div>
+          <div class="output-header-right">
+            <div class="download-actions" id="download-actions" style="display:none">
+              <button class="btn-download" onclick="downloadPDF()">
+                <svg width="11" height="11" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 1v9M4.5 10.5L8 14l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                PDF
+              </button>
+              <button class="btn-download" onclick="downloadDOC()">
+                <svg width="11" height="11" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 1v9M4.5 10.5L8 14l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                DOC
+              </button>
+            </div>
+            <div class="status-badge idle" id="status-badge">Ready</div>
+          </div>
+        </div>
+
+        <div class="output-card" id="output-card">
+          <div class="output-empty" id="output-empty">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="6" y="10" width="36" height="5" rx="2.5" fill="currentColor"/>
+              <rect x="6" y="21" width="28" height="4" rx="2" fill="currentColor"/>
+              <rect x="6" y="31" width="32" height="4" rx="2" fill="currentColor"/>
+              <rect x="6" y="41" width="20" height="4" rx="2" fill="currentColor"/>
+            </svg>
+            <p>Your synthesised report will appear here once you submit feedback.</p>
+          </div>
+          <div class="output-content" id="output-content" style="display:none"></div>
+          <div class="report-feedback-bar" id="report-feedback-bar" style="display:none">
+            <span class="feedback-prompt">Was this report useful?</span>
+            <div class="vote-buttons">
+              <button class="vote-btn" id="vote-up" onclick="voteReport(true)">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2L10.5 7H14L11 10l1 4-4-2.5L4 14l1-4-3-3h3.5L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                Useful
+              </button>
+              <button class="vote-btn" id="vote-down" onclick="voteReport(false)">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 3h10M3 8h7M3 13h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Needs work
+              </button>
+            </div>
+            <div class="report-comment-wrap" id="report-comment-wrap" style="display:none">
+              <textarea id="report-comment" placeholder="What could be improved? (optional)"></textarea>
+              <div class="btn-row">
+                <button class="btn-primary" style="font-size:var(--font-size-xs);padding:var(--size-space-xs) var(--size-space-lg)" onclick="submitReportFeedback()">Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Marked.js for markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- html-docx-js for DOC export -->
+  <script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
