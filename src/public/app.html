@@ -53,11 +53,16 @@
       gap: var(--size-space-xl);
     }
 
-    header h1 {
+    .header-logo {
       font-size: var(--font-size-xl);
       font-weight: var(--font-weight-semibold);
       color: var(--color-text-primary);
       letter-spacing: -0.01em;
+      text-decoration: none;
+    }
+
+    .header-logo:hover {
+      color: var(--color-action-primary-bg);
     }
 
     header p {
@@ -84,6 +89,39 @@
       border-color: var(--color-action-primary-bg);
       color: var(--color-action-primary-bg);
       background: rgba(138, 91, 118, 0.05);
+    }
+
+    /* ── Floating report feedback ── */
+    .report-feedback-float {
+      position: fixed;
+      bottom: var(--size-space-xl);
+      right: var(--size-space-xl);
+      z-index: 200;
+      background: var(--color-background-elevated);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--size-radius-lg);
+      box-shadow: var(--size-shadow-md);
+      padding: var(--size-space-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--size-space-md);
+      width: 260px;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .report-feedback-float.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+
+    .report-feedback-float .feedback-prompt {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
     }
 
     /* ── Modal ── */
@@ -843,7 +881,7 @@
     <header>
       <div class="header-inner">
         <div>
-          <h1>Feedback Synthesiser</h1>
+          <a class="header-logo" href="/">Feedback Synthesiser</a>
           <p>Paste messy stakeholder feedback — get clean themes, conflicts, and an action plan.</p>
         </div>
         <button class="btn-feedback" onclick="openFeedbackModal()">Give feedback</button>
@@ -1010,25 +1048,6 @@
             <p>Your synthesised report will appear here once you submit feedback.</p>
           </div>
           <div class="output-content" id="output-content" style="display:none"></div>
-          <div class="report-feedback-bar" id="report-feedback-bar" style="display:none">
-            <span class="feedback-prompt">Was this report useful?</span>
-            <div class="vote-buttons">
-              <button class="vote-btn" id="vote-up" onclick="voteReport(true)">
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2L10.5 7H14L11 10l1 4-4-2.5L4 14l1-4-3-3h3.5L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
-                Useful
-              </button>
-              <button class="vote-btn" id="vote-down" onclick="voteReport(false)">
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 3h10M3 8h7M3 13h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                Needs work
-              </button>
-            </div>
-            <div class="report-comment-wrap" id="report-comment-wrap" style="display:none">
-              <textarea id="report-comment" placeholder="What could be improved? (optional)"></textarea>
-              <div class="btn-row">
-                <button class="btn-primary" style="font-size:var(--font-size-xs);padding:var(--size-space-xs) var(--size-space-lg)" onclick="submitReportFeedback()">Send</button>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
     </main>
@@ -1038,6 +1057,27 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <!-- html-docx-js for DOC export -->
   <script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
+  <!-- Floating report feedback -->
+  <div class="report-feedback-float" id="report-feedback-bar">
+    <span class="feedback-prompt">Was this report useful?</span>
+    <div class="vote-buttons">
+      <button class="vote-btn" id="vote-up" onclick="voteReport(true)">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2L10.5 7H14L11 10l1 4-4-2.5L4 14l1-4-3-3h3.5L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        Useful
+      </button>
+      <button class="vote-btn" id="vote-down" onclick="voteReport(false)">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 3h10M3 8h7M3 13h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Needs work
+      </button>
+    </div>
+    <div class="report-comment-wrap" id="report-comment-wrap" style="display:none">
+      <textarea id="report-comment" placeholder="What could be improved? (optional)"></textarea>
+      <div class="btn-row">
+        <button class="btn-primary" style="font-size:var(--font-size-xs);padding:var(--size-space-xs) var(--size-space-lg)" onclick="submitReportFeedback()">Send</button>
+      </div>
+    </div>
+  </div>
+
   <script src="/app.js"></script>
 </body>
 </html>

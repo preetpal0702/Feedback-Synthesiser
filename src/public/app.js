@@ -132,14 +132,13 @@ function renderMarkdown(raw) {
 // ── Report actions (download + feedback) ──
 function showReportActions() {
   document.getElementById("download-actions").style.display = "flex";
-  document.getElementById("report-feedback-bar").style.display = "flex";
+  document.getElementById("report-feedback-bar").classList.add("visible");
 }
 
 function hideReportActions() {
   document.getElementById("download-actions").style.display = "none";
   const bar = document.getElementById("report-feedback-bar");
-  bar.style.display = "none";
-  // Reset vote state
+  bar.classList.remove("visible");
   document.getElementById("vote-up").className = "vote-btn";
   document.getElementById("vote-down").className = "vote-btn";
   document.getElementById("report-comment-wrap").style.display = "none";
@@ -277,7 +276,8 @@ async function synthesise() {
           if (parsed.text) {
             raw += parsed.text;
             outputContent.innerHTML = marked.parse(raw) + '<span class="cursor"></span>';
-            outputContent.scrollTop = outputContent.scrollHeight;
+            const panel = document.querySelector(".panel-output");
+            panel.scrollTop = panel.scrollHeight;
           }
         } catch (e) {
           if (e.message !== "Unexpected end of JSON input") throw e;
@@ -442,6 +442,8 @@ async function mockSynthesise() {
     await new Promise(r => setTimeout(r, 18));
     rendered += (rendered ? " " : "") + word;
     outputContent.innerHTML = marked.parse(rendered) + '<span class="cursor"></span>';
+    const panel = document.querySelector(".panel-output");
+    panel.scrollTop = panel.scrollHeight;
   }
 
   renderMarkdown(MOCK_RESPONSE);
