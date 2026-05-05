@@ -1164,10 +1164,6 @@
 
           <div class="upload-bar">
             <button class="btn-upload" onclick="document.getElementById('file-input').click()">
-              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M8 1v9M4.5 4.5L8 1l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
               Upload transcript
             </button>
             <span class="upload-hint">or drag &amp; drop · txt, md, vtt, srt, csv</span>
@@ -1213,20 +1209,8 @@
           <div class="panel-label">Synthesis</div>
           <div class="output-header-right">
             <div class="download-actions" id="download-actions" style="display:none">
-              <button class="btn-download" onclick="downloadPDF()">
-                <svg width="11" height="11" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8 1v9M4.5 10.5L8 14l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
-                PDF
-              </button>
-              <button class="btn-download" onclick="downloadDOC()">
-                <svg width="11" height="11" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8 1v9M4.5 10.5L8 14l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
-                DOC
-              </button>
+              <button class="btn-download" onclick="downloadPDF()">PDF</button>
+              <button class="btn-download" onclick="downloadDOC()">DOC</button>
             </div>
             <div class="status-badge idle" id="status-badge">Ready</div>
           </div>
@@ -1276,14 +1260,8 @@
   <div class="report-feedback-float" id="report-feedback-bar">
     <span class="feedback-prompt">Was this report useful?</span>
     <div class="vote-buttons">
-      <button class="vote-btn" id="vote-up" onclick="voteReport(true)">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2L10.5 7H14L11 10l1 4-4-2.5L4 14l1-4-3-3h3.5L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
-        Useful
-      </button>
-      <button class="vote-btn" id="vote-down" onclick="voteReport(false)">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 3h10M3 8h7M3 13h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        Needs work
-      </button>
+      <button class="vote-btn" id="vote-up" onclick="voteReport(true)">Useful</button>
+      <button class="vote-btn" id="vote-down" onclick="voteReport(false)">Needs work</button>
     </div>
     <div class="report-comment-wrap" id="report-comment-wrap" style="display:none">
       <textarea id="report-comment" placeholder="What could be improved? (optional)"></textarea>
