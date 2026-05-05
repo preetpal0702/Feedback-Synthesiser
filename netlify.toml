@@ -1,0 +1,8 @@
+[build]
+  publish = "src/public"
+  command = "mkdir -p src/public/dist && cp dist/variables.css src/public/dist/variables.css"
+
+[[redirects]]
+  from = "/app"
+  to = "/app.html"
+  status = 200
