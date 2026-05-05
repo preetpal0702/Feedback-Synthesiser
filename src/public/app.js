@@ -525,6 +525,115 @@ function toggleSimpleMode(isSimple) {
   updateCharCount();
 }
 
+// ── Vibe Mode ──
+let vibeCtx = null;
+let vibeScheduler = null;
+let vibeNextBeat = 0;
+let vibeTick = 0;
+const VIBE_BPM = 128;
+const VIBE_STEP = 60 / VIBE_BPM / 4; // 16th note duration
+
+function vibeKick(t) {
+  const osc = vibeCtx.createOscillator();
+  const env = vibeCtx.createGain();
+  osc.connect(env); env.connect(vibeCtx.destination);
+  osc.frequency.setValueAtTime(160, t);
+  osc.frequency.exponentialRampToValueAtTime(0.01, t + 0.45);
+  env.gain.setValueAtTime(1, t);
+  env.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+  osc.start(t); osc.stop(t + 0.45);
+}
+
+function vibeHat(t, open = false) {
+  const buf = vibeCtx.createBuffer(1, vibeCtx.sampleRate * 0.08, vibeCtx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  const src = vibeCtx.createBufferSource();
+  src.buffer = buf;
+  const hp = vibeCtx.createBiquadFilter();
+  hp.type = 'highpass'; hp.frequency.value = 7000;
+  const env = vibeCtx.createGain();
+  const dur = open ? 0.12 : 0.04;
+  env.gain.setValueAtTime(open ? 0.25 : 0.18, t);
+  env.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  src.connect(hp); hp.connect(env); env.connect(vibeCtx.destination);
+  src.start(t); src.stop(t + dur);
+}
+
+function vibeBass(t, freq) {
+  const osc = vibeCtx.createOscillator();
+  osc.type = 'sawtooth';
+  const lp = vibeCtx.createBiquadFilter();
+  lp.type = 'lowpass'; lp.frequency.value = 400;
+  const env = vibeCtx.createGain();
+  osc.connect(lp); lp.connect(env); env.connect(vibeCtx.destination);
+  osc.frequency.setValueAtTime(freq, t);
+  env.gain.setValueAtTime(0.35, t);
+  env.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+  osc.start(t); osc.stop(t + 0.25);
+}
+
+function vibePad(t, freqs) {
+  freqs.forEach(freq => {
+    const osc = vibeCtx.createOscillator();
+    osc.type = 'sine';
+    const env = vibeCtx.createGain();
+    osc.connect(env); env.connect(vibeCtx.destination);
+    osc.frequency.setValueAtTime(freq, t);
+    env.gain.setValueAtTime(0, t);
+    env.gain.linearRampToValueAtTime(0.06, t + 0.05);
+    env.gain.exponentialRampToValueAtTime(0.001, t + 0.9);
+    osc.start(t); osc.stop(t + 0.95);
+  });
+}
+
+const BASS_NOTES = [55, 0, 0, 55, 0, 0, 62, 0, 55, 0, 0, 55, 0, 0, 49, 0];
+const PAD_CHORDS = [[220, 277, 330], null, null, null, [196, 247, 294], null, null, null];
+
+function vibeSchedule() {
+  while (vibeNextBeat < vibeCtx.currentTime + 0.12) {
+    const step16 = vibeTick % 16;
+    const step8  = vibeTick % 8;
+
+    if (step16 % 4 === 0) vibeKick(vibeNextBeat);
+    if (step16 % 2 === 0) vibeHat(vibeNextBeat, step16 % 4 === 2);
+    if (BASS_NOTES[step16]) vibeBass(vibeNextBeat, BASS_NOTES[step16]);
+    if (PAD_CHORDS[step8]) vibePad(vibeNextBeat, PAD_CHORDS[step8]);
+
+    vibeNextBeat += VIBE_STEP;
+    vibeTick++;
+  }
+}
+
+function startVibeAudio() {
+  vibeCtx = new (window.AudioContext || window.webkitAudioContext)();
+  vibeNextBeat = vibeCtx.currentTime + 0.1;
+  vibeTick = 0;
+  vibeScheduler = setInterval(vibeSchedule, 25);
+}
+
+function stopVibeAudio() {
+  clearInterval(vibeScheduler);
+  vibeScheduler = null;
+  if (vibeCtx) { vibeCtx.close(); vibeCtx = null; }
+}
+
+function toggleVibeMode(on) {
+  document.body.classList.toggle('vibe-mode', on);
+  document.getElementById('disco-overlay').classList.toggle('active', on);
+  localStorage.setItem('vibeMode', on ? '1' : '0');
+  if (on) startVibeAudio(); else stopVibeAudio();
+}
+
+// Restore vibe state on page load
+window.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('vibeMode') === '1') {
+    const toggle = document.getElementById('vibe-toggle');
+    toggle.checked = true;
+    toggleVibeMode(true);
+  }
+});
+
 function clearAll() {
   document.getElementById("project-name").value = "";
   document.getElementById("decision").value = "";
