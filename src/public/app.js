@@ -607,9 +607,11 @@ function vibeSchedule() {
 
 function startVibeAudio() {
   vibeCtx = new (window.AudioContext || window.webkitAudioContext)();
-  vibeNextBeat = vibeCtx.currentTime + 0.1;
-  vibeTick = 0;
-  vibeScheduler = setInterval(vibeSchedule, 25);
+  vibeCtx.resume().then(() => {
+    vibeNextBeat = vibeCtx.currentTime + 0.1;
+    vibeTick = 0;
+    vibeScheduler = setInterval(vibeSchedule, 25);
+  });
 }
 
 function stopVibeAudio() {

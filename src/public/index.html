@@ -551,6 +551,20 @@
       50%      { box-shadow: 0 0 28px rgba(168,85,247,0.95), 0 0 58px rgba(236,72,153,0.65); }
     }
 
+    /* ── Vibe mode mobile fixes ── */
+    @media (max-width: 768px) {
+      .disco-light {
+        mix-blend-mode: normal;
+        opacity: 0.18;
+        filter: blur(70px);
+      }
+      .disco-ball-wrap {
+        top: 40%;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    }
+
     /* ── Responsive ── */
     @media (max-width: 900px) {
       .hero-inner { flex-direction: column; }
@@ -850,9 +864,11 @@
       localStorage.setItem('vibeMode', on ? '1' : '0');
       if (on) {
         vibeCtx = new (window.AudioContext || window.webkitAudioContext)();
-        vibeNextBeat = vibeCtx.currentTime + 0.1;
-        vibeTick = 0;
-        vibeScheduler = setInterval(vibeSchedule, 25);
+        vibeCtx.resume().then(() => {
+          vibeNextBeat = vibeCtx.currentTime + 0.1;
+          vibeTick = 0;
+          vibeScheduler = setInterval(vibeSchedule, 25);
+        });
       } else {
         clearInterval(vibeScheduler);
         if (vibeCtx) { vibeCtx.close(); vibeCtx = null; }
