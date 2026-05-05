@@ -1,16 +1,15 @@
+functionsDirectory = "/Users/Preetpal/Documents/GitHub/Feedback-Synthesiser/netlify/functions"
+functionsDirectoryOrigin = "config"
 redirectsOrigin = "config"
 plugins = []
 headers = []
-
-[functions]
-
-[functions."*"]
 
 [build]
 publish = "/Users/Preetpal/Documents/GitHub/Feedback-Synthesiser/src/public"
 publishOrigin = "config"
 commandOrigin = "config"
 command = "mkdir -p src/public/dist && cp dist/variables.css src/public/dist/variables.css"
+functions = "/Users/Preetpal/Documents/GitHub/Feedback-Synthesiser/netlify/functions"
 
 [build.environment]
 
@@ -25,6 +24,11 @@ command = "mkdir -p src/public/dist && cp dist/variables.css src/public/dist/var
 [build.processing.js]
 
 [build.services]
+
+[functions]
+
+[functions."*"]
+node_bundler = "esbuild"
 
 [[redirects]]
 from = "/app"
