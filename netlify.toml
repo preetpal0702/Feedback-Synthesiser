@@ -2,6 +2,10 @@
   publish = "src/public"
   command = "mkdir -p src/public/dist && cp dist/variables.css src/public/dist/variables.css"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
 [[redirects]]
   from = "/app"
   to = "/app.html"
