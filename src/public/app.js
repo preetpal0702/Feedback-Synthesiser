@@ -623,6 +623,8 @@ function stopVibeAudio() {
 function toggleVibeMode(on) {
   document.body.classList.toggle('vibe-mode', on);
   document.getElementById('disco-overlay').classList.toggle('active', on);
+  const input = document.getElementById('vibe-toggle');
+  input.setAttribute('aria-checked', on ? 'true' : 'false');
   localStorage.setItem('vibeMode', on ? '1' : '0');
   if (on) startVibeAudio(); else stopVibeAudio();
 }

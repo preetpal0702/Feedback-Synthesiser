@@ -868,9 +868,26 @@
       color: var(--color-text-muted);
       user-select: none;
       flex-shrink: 0;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
     }
 
-    .vibe-toggle input { display: none; }
+    .vibe-toggle input {
+      position: absolute;
+      opacity: 0;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+    }
+
+    .vibe-toggle:focus-within .vibe-track {
+      outline: 2px solid var(--color-action-primary-bg);
+      outline-offset: 2px;
+    }
 
     .vibe-track {
       width: 36px;
@@ -1033,9 +1050,16 @@
 
     /* ── Vibe mode mobile fixes ── */
     @media (max-width: 768px) {
+      header {
+        z-index: 600; /* above disco overlay at 500 so toggle stays tappable */
+      }
+      .disco-overlay,
+      .disco-overlay * {
+        pointer-events: none !important;
+      }
       .disco-light {
         mix-blend-mode: normal;
-        opacity: 0.18;
+        opacity: 0.3;
         filter: blur(70px);
       }
       .disco-ball-wrap {
@@ -1043,6 +1067,19 @@
         left: 50%;
         transform: translateX(-50%);
       }
+    }
+
+    /* ── Reduced motion ── */
+    @media (prefers-reduced-motion: reduce) {
+      .disco-overlay { display: none !important; }
+      .disco-ball { animation: none; }
+      .sparkle { animation: none; opacity: 0; }
+      body.vibe-mode .btn-primary,
+      body.vibe-mode .btn-secondary,
+      body.vibe-mode .btn-feedback,
+      body.vibe-mode .btn-upload,
+      body.vibe-mode .btn-download,
+      body.vibe-mode .vote-btn { animation: none; }
     }
 
     /* ── Print ── */
@@ -1074,8 +1111,8 @@
         </div>
         <div style="display:flex;align-items:center;gap:var(--size-space-md)">
           <label class="vibe-toggle" title="Vibe mode">
-            <input type="checkbox" id="vibe-toggle" onchange="toggleVibeMode(this.checked)" />
-            <span class="vibe-track"></span>
+            <input type="checkbox" id="vibe-toggle" role="switch" aria-checked="false" aria-label="Vibe mode" onchange="toggleVibeMode(this.checked)" />
+            <span class="vibe-track" aria-hidden="true"></span>
             Vibe mode
           </label>
           <button class="btn-feedback" onclick="openFeedbackModal()">Give feedback</button>
@@ -1233,7 +1270,7 @@
   </div>
 
   <!-- Disco overlay -->
-  <div class="disco-overlay" id="disco-overlay">
+  <div class="disco-overlay" id="disco-overlay" aria-hidden="true">
     <div class="disco-ball-wrap">
       <div class="disco-ball">🪩</div>
       <span class="sparkle s1">✦</span>
