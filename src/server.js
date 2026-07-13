@@ -1,10 +1,10 @@
 require("dotenv").config({ override: true });
 const express = require("express");
-const Anthropic = require("@anthropic-ai/sdk");
+const OpenAI = require("openai");
 const path = require("path");
 
 const app = express();
-const client = new Anthropic();
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const SYSTEM_PROMPT = `Act as a design lead preparing a decision-ready synthesis after a cross-functional review.
 
@@ -74,20 +74,20 @@ app.post("/synthesise", async (req, res) => {
   res.setHeader("Connection", "keep-alive");
 
   try {
-    const stream = client.messages.stream({
-      model: "claude-opus-4-7",
+    const stream = await client.chat.completions.create({
+      model: "gpt-4o-mini",
       max_tokens: 4096,
-      thinking: { type: "adaptive" },
-      system: SYSTEM_PROMPT,
-      messages: [{ role: "user", content: feedback }],
+      stream: true,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: feedback },
+      ],
     });
 
-    for await (const event of stream) {
-      if (
-        event.type === "content_block_delta" &&
-        event.delta.type === "text_delta"
-      ) {
-        res.write(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`);
+    for await (const chunk of stream) {
+      const text = chunk.choices[0]?.delta?.content;
+      if (text) {
+        res.write(`data: ${JSON.stringify({ text })}\n\n`);
       }
     }
 
