@@ -1,4 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 
 const SYSTEM_PROMPT = `Act as a design lead preparing a decision-ready synthesis after a cross-functional review.
 
@@ -76,14 +76,14 @@ export default async (req) => {
     });
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!process.env.OPENAI_API_KEY) {
     return new Response(
-      JSON.stringify({ error: "API key not configured. Add ANTHROPIC_API_KEY in your Netlify environment variables." }),
+      JSON.stringify({ error: "API key not configured. Add OPENAI_API_KEY in your Netlify environment variables." }),
       { status: 503, headers: { "Content-Type": "application/json" } }
     );
   }
 
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   const readable = new ReadableStream({
     async start(controller) {
@@ -91,21 +91,19 @@ export default async (req) => {
       const send = (data) => controller.enqueue(encoder.encode(`data: ${data}\n\n`));
 
       try {
-        const stream = client.messages.stream({
-          model: "claude-opus-4-7",
+        const stream = await client.chat.completions.create({
+          model: "gpt-4o-mini",
           max_tokens: 4096,
-          thinking: { type: "adaptive" },
-          system: SYSTEM_PROMPT,
-          messages: [{ role: "user", content: feedback }],
+          stream: true,
+          messages: [
+            { role: "system", content: SYSTEM_PROMPT },
+            { role: "user", content: feedback },
+          ],
         });
 
-        for await (const event of stream) {
-          if (
-            event.type === "content_block_delta" &&
-            event.delta.type === "text_delta"
-          ) {
-            send(JSON.stringify({ text: event.delta.text }));
-          }
+        for await (const chunk of stream) {
+          const text = chunk.choices[0]?.delta?.content;
+          if (text) send(JSON.stringify({ text }));
         }
 
         send("[DONE]");
