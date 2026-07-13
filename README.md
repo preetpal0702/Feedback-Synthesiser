@@ -48,7 +48,7 @@ The output covers seven sections:
 ### Prerequisites
 
 - Node.js 18+
-- An Anthropic API key — get one at [console.anthropic.com](https://console.anthropic.com)
+- An OpenAI API key — get one at [platform.openai.com](https://platform.openai.com)
 
 ### Install
 
@@ -63,7 +63,7 @@ npm install
 Create a `.env` file in the project root:
 
 ```
-ANTHROPIC_API_KEY=your_api_key_here
+OPENAI_API_KEY=your_api_key_here
 ```
 
 ### Run
@@ -131,6 +131,7 @@ npx style-dictionary build --config config.json
 | Layer | Technology |
 |---|---|
 | Server | Node.js + Express 5 |
+| AI | OpenAI gpt-4o-mini |
 | Streaming | Server-Sent Events (SSE) |
 | Frontend | Vanilla JS, no framework |
 | Markdown | Marked.js |
